@@ -1,0 +1,15 @@
+类似于maven的打包工具，可不用理之。
+lein deps  下载project.clj需要依赖的jar包
+lein compile 编译
+
+安装：
+Leiningen is a simple build tool for Clojure, based on Maven (I’m pretty sure). It offers a simple, Clojuresque way of constructing build files for your Clojure projects (which run on the JVM).
+To install Leiningen you only have to download one file and put it in some directory that’s on your PATH:
+cd ~/bin
+wget http://github.com/technomancy/leiningen/raw/stable/bin/lein
+chmod +x lein
+You then do a self-install:
+lein self-install
+This will dowload a number of jar files, including Clojure itself, so you do not even have to have Clojure installed at this point.
+
+lein uberjar

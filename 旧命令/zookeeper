@@ -1,0 +1,71 @@
+zookeeper-3.3.3:
+============================
+＊安装: http://labs.renren.com/apache-mirror/zookeeper/
+   参考官方文档安装：http://zookeeper.apache.org/doc/r3.3.3/zookeeperStarted.html
+   详细：http://zookeeper.apache.org/doc/r3.3.3/zookeeperAdmin.html
+ 
+＊创建：conf/zoo.cfg
+	dataDir：日志文件保存路径
+	server.1=localhost:2888:3888
+	server.*:*代表此机器的myid的配置，在dataDir目录下创建一个文件名myid，里面的写1，＊即为1,且在整个集群里是唯一。
+	
+	
+zk的日志压缩：
+============================
+java -cp zookeeper.jar:log4j.jar:conf org.apache.zookeeper.server.PurgeTxnLog <dataDir> <snapDir> -n <count>
+count：最低为3
+
+eg:
+java -cp zookeeper-3.3.3.jar:lib/log4j-1.2.15.jar:conf org.apache.zookeeper.server.PurgeTxnLog /home/zhaolei/company/distrbute/zookeeper-3.3.3/lib/zookeeper /home/zhaolei/company/distrbute/zookeeper-3.3.3/lib/zookeeper -n 4
+
+/home/zhaolei/company/distrbute/zookeeper-3.3.3
+
+java -cp /home/zhaolei/company/distrbute/zookeeper-3.3.3/zookeeper-3.3.3.jar:/home/zhaolei/company/distrbute/lib/log4j-1.2.15.jar:conf org.apache.zookeeper.server.PurgeTxnLog /home/zhaolei/company/distrbute/zookeeper-3.3.3/lib/zookeeper /home/zhaolei/company/distrbute/zookeeper-3.3.3/lib/zookeeper -n 4
+
+
+
+//http://chenlx.blog.51cto.com/4096635/740112
+
+另外需要一个定时执行脚本：zklog.sh
+
+
+zk daemontools监控安装
+============================
+＊下载： http://cr.yp.to/daemontools.html
+
+Create a /package directory:
+
+     mkdir -p /package
+     chmod 1755 /package
+     cd /package
+
+Download daemontools-0.76.tar.gz into /package. Unpack the daemontools package:
+
+     gunzip daemontools-0.76.tar
+     tar -xpf daemontools-0.76.tar
+     rm -f daemontools-0.76.tar
+     cd admin/daemontools-0.76
+
+Compile and set up the daemontools programs:
+
+     package/install
+     
+＊解决问题：
+如出现TLS definition in /lib/libc.so.6 section .tbss mismatches non-TLS reference in tcpserver.o ...
+执行如下步骤：
+ 修改 src/conf-cc 在最后加上
+ -include /usr/include/errno.h
+ 
+ 修改admin/daemontools-version/src/error.h
+ 将里面的extern int errno; 替换为 #include <errno.h>
+
+
+
+其他：
+===============================
+＊命令：bin/zkServer.sh start stop status
+
+＊Java端连接测试：bin/zkCli.sh -server 127.0.0.1:2181
+
+
+

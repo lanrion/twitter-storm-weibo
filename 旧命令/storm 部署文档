@@ -1,0 +1,22 @@
+zookeeper:
+监控命令：root@Io:/service/zookeeper# run
+exec 2>&1
+exec /root/distributed/zookeeper/bin/zkServer.sh start
+
+启动命令：supervise /service/zookeeper
+
+
+
+storm:
+
+运行：/distributed/storm-0.7.2# 
+命令配置的：
+export STORM_HOME=/usr/local/storm-0.7.4
+export PATH=$PATH:$STORM_HOME/bin
+
+
+把每一个服务器上的/etc/hosts
+10.0.0.21       Io
+10.0.0.22       Ganymade
+
+

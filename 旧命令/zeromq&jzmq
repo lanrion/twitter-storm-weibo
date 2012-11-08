@@ -1,0 +1,28 @@
+安装zeromq
+=====================================
+# wget http://download.zeromq.org/zeromq-2.1.7.tar.gz
+# tar zxf zeromq-2.1.7.tar.gz
+# cd zeromq-2.1.7
+# ./configure
+#make
+#make install
+更新LD_LIBRARY_PATH 
+#ldconfig
+
+安装jzmq
+=====================================
+#git clone git://github.com/nathanmarz/jzmq.git
+# cd jzmq 
+# ./autogen.sh
+# ./configure
+# make
+如下处理错误：（http://my.oschina.net/mingdongcheng/blog/43009）
+（1）make[1]: *** No rule to make target `classdist_noinst.stamp', needed by `org/zeromq/ZMQ.class'.  Stop.
+		解决：touch src/classdist_noinst.stamp
+
+（2）make[1]: *** No rule to make target `org/zeromq/ZMQException.class, needed by `all'.  Stop.
+		解决： 
+				cd src/org/zeromq/
+				$/jzmq/src/org/zeromq]$ javac  *.java
+	
+# make install

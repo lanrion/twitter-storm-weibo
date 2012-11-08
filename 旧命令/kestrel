@@ -1,0 +1,118 @@
+
+(1)首先要安装daemon(http://libslack.org/daemon/download/)
+tar xvzf daemon-0.6.4.tar.gz
+cd daemon-0.6.4
+./config
+make
+make test
+make install
+make install-daemon-conf
+make install-slack
+
+(2)下载发行包安装：http://robey.github.com/kestrel/
+	修改config/development，..配置文件
+	运行: java -server -Dstage=development -jar kestrel_2.9.1-2.2.0.jar
+  会自动创建日志文件 
+  
+(3)测试数据：
+	1. open another terminal 
+	telnet localhost 22133  
+	set mytest 0 0 3  
+	aaa  
+
+	2. open another terminal 
+	telnet localhost 22133  
+	get mytest  
+
+	3. repeat step 1，then shutdown the kestrel servie.   
+  
+  
+  通过命令查看所有：ps aux | less
+  
+  
+ （从kestrel源代码编译安装,安装好sbt(使用apt-get方法安装：http://www.scala-sbt.org/download.html#deb)）
+ 
+hi:
+when I use storm-0.7.2/0.7.4 (topology.workers>1)and kestrel2.2.0  to test TestTopology:
+public class TestTopology {
+	public static Logger logger = Logger.getLogger(TestTopology.class);
+    public static class FailEveryOther extends BaseRichBolt {
+            OutputCollector _collector;
+        @Override
+        public void prepare(Map map, TopologyContext tc, OutputCollector collector) {
+            _collector = collector;
+        }
+        @Override
+        public void execute(Tuple tuple) {
+            	_collector.emit(tuple, new Values(tuple.getString(0) + " ack!!!"));
+            	logger.info("TestTopology begin acking...");
+                _collector.ack(tuple);
+                logger.info("TestTopology end acking...");
+
+        }
+                @Override
+        public void declareOutputFields(OutputFieldsDeclarer declarer) {
+        	declarer.declare(new Fields("spout"));
+        }
+    }    
+    public static void main(String[] args) throws Exception {
+        TopologyBuilder builder = new TopologyBuilder();
+//KestrelThriftSpouts , i add logs.
+        KestrelThriftSpouts spout = new KestrelThriftSpouts("125.64.96.77", 2229, "tweet_id", new StringScheme());
+        builder.setSpout("spout", spout, 8).setDebug(true);
+        builder.setBolt("bolt", new FailEveryOther(), 12).shuffleGrouping("spout");
+        Config conf = new Config();
+        conf.setDebug(true);
+        conf.setNumWorkers(3);
+        conf.setNumAckers(1);
+        conf.setMessageTimeoutSecs(120);
+         StormSubmitter.submitTopology(args[0], conf, builder.createTopology());
+        Thread.sleep(6000);
+    }
+}
+
+the worker-xxx.log will  throws "Failing message backtype.storm.spout.KestrelThriftSpouts$KestrelSourceId@157dbcd4: {:stream "default", :values #<Values [4ffd2af1ea8dbc7f060000a6]>}"!
+but when setting the Config's topology.workers = 1, (conf.setNumWorkers(int num); ),it throws nothing and insert successfully and "num>1",i will throws Failing message.....
+2 servers: one server for kestrel and supervisor, another for zookeeper3.3.5 and storm、supervisor
+storm-kestrel: https://github.com/nathanmarz/storm-kestrel
+ kestrel2.2.0: https://github.com/robey/kestrel , start:  java -server -Dstage=development -jar kestrel_2.9.1-2.2.0.jar
+logs:
+2012-07-11 17:10:24 KestrelThriftSpouts [INFO] nextTuple emit....
+2012-07-11 17:10:24 task [INFO] Emitting: spout default [4ffd33a8ea8dbc7f060000c1]
+2012-07-11 17:10:24 task [INFO] Emitting: spout __ack_init [-6239356917633221864 -5514322528160316951 15]
+2012-07-11 17:10:24 KestrelThriftSpouts [INFO] nextTuple emit....
+2012-07-11 17:10:24 task [INFO] Emitting: spout default [4ffd339fea8dbc7f060000b8]
+2012-07-11 17:10:24 task [INFO] Emitting: spout __ack_init [-5035342350608364297 -6394318549876302773 15]
+2012-07-11 17:10:57 KestrelThriftSpouts [INFO] nextTuple emit....
+2012-07-11 17:10:57 task [INFO] Emitting: spout default [4ffd42edea8dbc7f060000d0]
+2012-07-11 17:10:57 task [INFO] Emitting: spout __ack_init [-7503720500743247325 -4986410919560340558 21]
+2012-07-11 17:12:24 KestrelThriftSpouts [INFO] nextTuple emit....
+2012-07-11 17:12:24 KestrelThriftSpouts [INFO] nextTuple emit....
+2012-07-11 17:12:24 task [INFO] Emitting: spout default [4ffd33a8ea8dbc7f060000c1]
+2012-07-11 17:12:24 task [INFO] Emitting: spout default [4ffd339fea8dbc7f060000b8]
+2012-07-11 17:12:24 task [INFO] Emitting: spout __ack_init [-7930281508316730583 -6522575138015003458 15]
+2012-07-11 17:12:24 task [INFO] Emitting: bolt default [4ffd33a8ea8dbc7f060000c1 ack!!!]
+2012-07-11 17:12:24 task [INFO] Emitting: spout __ack_init [-7212302578043223451 -6065485379151882625 18]
+2012-07-11 17:12:24 TestTopology [INFO] TestTopology begin acking...
+2012-07-11 17:12:24 task [INFO] Emitting: bolt __ack_ack [-7930281508316730583 -6522575138015003458]
+2012-07-11 17:12:24 TestTopology [INFO] TestTopology end acking...
+2012-07-11 17:12:54 KestrelThriftSpouts [INFO] nextTuple emit....
+2012-07-11 17:12:54 task [INFO] Emitting: spout default [4ffd42ebea8dbc7f060000ca]
+2012-07-11 17:12:54 task [INFO] Emitting: spout __ack_init [-6450363946338335970 -7961604298002805548 15]
+2012-07-11 17:13:24 task [INFO] Failing message backtype.storm.spout.KestrelThriftSpouts$KestrelSourceId@698c10b8: {:stream "default", :values #<Values [4ffd33a8ea8dbc7f060000c1]>}
+2012-07-11 17:13:24 KestrelThriftSpouts [INFO] KestrelThriftSpout failing....
+2012-07-11 17:13:24 KestrelThriftSpouts [INFO] return abort num: 0
+2012-07-11 17:13:24 task [INFO] Failing message backtype.storm.spout.KestrelThriftSpouts$KestrelSourceId@25616d8d: {:stream "default", :values #<Values [4ffd339fea8dbc7f060000b8]>}
+2012-07-11 17:13:24 KestrelThriftSpouts [INFO] KestrelThriftSpout failing....
+2012-07-11 17:13:24 KestrelThriftSpouts [INFO] return abort num: 0
+2012-07-11 17:13:24 task [INFO] Failing message backtype.storm.spout.KestrelThriftSpouts$KestrelSourceId@1f5f5727: {:stream "default", :values #<Values [4ffd42edea8dbc7f060000d0]>}
+2012-07-11 17:13:24 KestrelThriftSpouts [INFO] KestrelThriftSpout failing....
+2012-07-11 17:13:24 KestrelThriftSpouts [INFO] return abort num: 0
+2012-07-11 17:14:24 KestrelThriftSpouts [INFO] nextTuple emit....
+2012-07-11 17:14:24 task [INFO] Emitting: spout default [4ffd33a8ea8dbc7f060000c1]
+2012-07-11 17:14:24 task [INFO] Emitting: spout __ack_init [-8407868592253018928 -8818823351517893162 21]
+Thank you!
+
+ 
+
+  

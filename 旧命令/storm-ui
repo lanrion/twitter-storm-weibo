@@ -1,0 +1,3 @@
+emitted栏显示的数字表示的是调用OutputCollector的emit方法的次数.
+
+transferred栏显示的数字表示的是实际tuple发送到下一个task的计数.

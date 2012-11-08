@@ -1,0 +1,41 @@
+启动nimbus，bin/storm nimbus
+
+选择不同的worknode启动supervisor， bin/storm supervisor
+
+杀死：storm kill {stormname} 其中{stormname}是提交topology给storm集群的时候指定的名字。
+
+启动UI：bin/storm ui,访问时根据conf/storm.yaml的ui.port
+
+启动drpc服务 bin／storm drpc
+
+提交Topologies
+命令格式：storm jar 【jar路径】 【拓扑包名.拓扑类名】 【拓扑名称】
+样例：storm jar /storm-starter.jar storm.starter.WordCountTopology wordcountTop
+
+bin/storm jar /home/zhaolei/company/distrbute/testpro/weibo2.jar backtype.storm.spout.FeedTopology
+
+打印本地配置
+命令格式：storm localconfvalue 【配置参数关键字】
+举例：storm localconfvalue storm.zookeeper.servers
+#根据指定参数打印本地配置的值。
+
+打印远程配置
+命令格式：storm remoteconfvalue 【配置参数关键字】
+举例：storm remoteconfvalue storm.zookeeper.servers
+#根据指定参数打印远程配置的值。
+
+执行Shell脚本
+命令格式：storm shell resourcesdir command args
+
+查看状态：
+# vi logs/nimbus.log
+# vi logs/supervisor.log
+# vi logs/ui.log
+
+启动REPL
+REPL — read-evaluate-print-loop。
+虽然clojure可以作为一种脚本语言内嵌在java里面，但是它的首选编程方式是使用REPL，这是一个简单的命令行接口，使用它你可以输入你的命令，执行，然后查看结果， 你可以以下面这个命令来启动REPL：
+命令格式：storm repl
+
+打印CLASSPATH
+命令格式：storm classpath

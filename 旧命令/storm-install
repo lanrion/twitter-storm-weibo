@@ -1,0 +1,31 @@
+安装storm
+============================
+# wget https://github.com/downloads/nathanmarz/storm/storm-version.zip
+# unzip storm-version zip
+# cp -R storm-version /usr/local/
+# vi ～/.bashrc
+--
+追加
+ export STORM_HOME=/usr/local/storm-version
+ export PATH=$PATH:$STORM_HOME/bin
+ 
+
+部署说明：
+============================
+注意：需要把额外的JAR包添加到storm/lib目录下，否则找不到相关包！！
+
+使用storm.yaml的默认配置，
+所有机器的storm.zookeeper.servers的IP地址，表示你启动的zookeeper(zk)的机器的IP，这里的是一致的。
+所有机器的nimbus.host为启动nimbus的IP地址，也是一致的。
+storm.zookeeper.root: "/storm" ，所有的storm配置都应该保证同一目录，需要从zk里的目录下载相关的任务。
+
+
+
+
+
+
+
+
+
+
+

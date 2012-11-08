@@ -1,0 +1,7 @@
+gem 'kestrel-client', "~> 0.7.2"
+大部分机器编译一般出错，请执行：
+sudo apt-get install libsasl2-dev 
+之后可以安装成功。
+配置文档请查看GitHub
+
+如果出现其他依赖包错误，问谷姐。
